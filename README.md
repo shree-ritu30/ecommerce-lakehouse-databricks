@@ -7,18 +7,34 @@ The project demonstrates a medallion lakehouse, data-quality handling, dimension
 ## Architecture
 
 ```mermaid
-flowchart TD
-    A[Olist CSV files] --> B[Bronze: raw Delta tables]
-    B --> C[Silver: cleaned and validated tables]
-    C --> D[Gold: dimensions and fact tables]
-    D --> E[SQL business analytics]
-    F[Historical order event replay] --> G[Spark Structured Streaming]
-    G --> H[Delta streaming output]
-    I[Databricks Job] --> B
-    I --> C
-    I --> D
-    I --> G
+flowchart LR
+    A[Olist CSV Data] --> B[Bronze Layer]
+    B --> C[Silver Layer]
+    C --> D[Gold Layer]
+    D --> E[SQL Analytics]
+
+    C --> F[Structured Streaming]
+    F --> G[Delta Output]
+
+    H[Databricks Jobs] -. Orchestration .-> B
 ```
+
+## Pipeline Orchestration
+
+The complete data pipeline is orchestrated using **Databricks Jobs & Workflows**, with four sequential tasks running on Serverless compute.
+
+![Databricks Pipeline Execution](docs/screenshots/databricks-job-pipeline.png)
+
+### Pipeline Workflow
+
+1. **Bronze Ingestion:** Loads raw Olist CSV files into Delta tables.
+2. **Silver Transformations:** Cleans, validates, and transforms the ingested data.
+3. **Gold Analytics:** Builds analytical fact tables, dimension tables, and business metrics.
+4. **Streaming Pipeline:** Processes simulated historical order events using Spark Structured Streaming.
+
+All four tasks are connected through task dependencies and execute sequentially.
+
+**Execution Status:** All four tasks completed successfully.
 
 ## Technology stack
 - Databricks Free Edition / Serverless compute
